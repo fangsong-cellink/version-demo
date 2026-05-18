@@ -1,0 +1,72 @@
+name: CI Build
+
+on:
+  push:
+    branches:
+      - main
+      - 'v*'
+    tags:
+      - 'v*'
+      - 'v*-rc*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build (frontend + Tauri)
+    runs-on: ubuntu-latest
+    env:
+      BUILD_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Determine version with GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v4.5.0
+
+      - name: Write frontend build info
+        run: |
+          mkdir -p src
+          cat > src/build-info.json <<'EOF'
+          {
+            "version": "${{ steps.gitversion.outputs.SemVer }}",
+            "buildId": "${{ env.BUILD_ID }}",
+            "commitSha": "${{ github.sha }}"
+          }
+          EOF
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6.4.0
+        with:
+          node-version: '18'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install frontend dependencies
+        run: pnpm install
+
+      - name: Build frontend
+        run: pnpm build
+        env:
+          APP_VERSION: ${{ steps.gitversion.outputs.SemVer }}
+          BUILD_ID: ${{ env.BUILD_ID }}
+          COMMIT_SHA: ${{ github.sha }}
+
+      - name: Build Tauri (Rust)
+        working-directory: src-tauri
+        env:
+          VERSION: ${{ steps.gitversion.outputs.SemVer }}
+          BUILD_ID: ${{ env.BUILD_ID }}
+          COMMIT_SHA: ${{ github.sha }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: cargo build --release
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: tauri-release
+          path: src-tauri/target/release
