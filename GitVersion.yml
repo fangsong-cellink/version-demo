@@ -1,6 +1,6 @@
 mode: ContinuousDelivery
-tag-prefix: 'version-demo_v'
-next-version: version-demo_v1.0.0
+tag-prefix: '(release\/)?(version-demo_v)?'
+next-version: 1.0.0
 
 assembly-versioning-scheme: MajorMinorPatch
 assembly-file-versioning-scheme: MajorMinorPatch
