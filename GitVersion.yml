@@ -1,0 +1,26 @@
+mode: ContinuousDelivery
+tag-prefix: 'version-demo_v'
+next-version: version-demo_v1.0.0
+
+assembly-versioning-scheme: MajorMinorPatch
+assembly-file-versioning-scheme: MajorMinorPatch
+
+branches:
+  dev:
+    regex: ^master$|^main$|^dev$
+    mode: ContinuousDeployment
+    tag: alpha
+    increment: Minor
+    prevent-increment-of-merged-branch-version: true
+    tracks-release-branches: true 
+    is-release-branch: false
+
+  release:
+    regex: ^release\/version-demo_v(?<version>\d+\.\d+)
+    mode: ContinuousDelivery
+    tag: beta
+    increment: Patch
+    prevent-increment-of-merged-branch-version: true
+    is-release-branch: true
+
+major-version-bump-message: '\+semver:\s?(breaking|major)'
