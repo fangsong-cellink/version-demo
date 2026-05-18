@@ -4,6 +4,7 @@ next-version: 1.0.0
 
 assembly-versioning-scheme: MajorMinorPatch
 assembly-file-versioning-scheme: MajorMinorPatch
+semantic-version-format: Loose
 version-in-branch-pattern: '.*(?<version>\d+\.\d+(\.\d+)?)'
 
 branches:
