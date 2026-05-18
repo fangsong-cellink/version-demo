@@ -11,8 +11,6 @@ struct BuildInfo {
     version: String,
     build_id: String,
     commit_sha: String,
-    run_id: String,
-    run_attempt: String,
 }
 
 #[tauri::command]
@@ -22,15 +20,11 @@ fn get_build_info() -> BuildInfo {
         .unwrap_or_else(|| env!("CARGO_PKG_VERSION").to_string());
     let build_id = option_env!("BUILD_ID").unwrap_or("local").to_string();
     let commit_sha = option_env!("COMMIT_SHA").unwrap_or("unknown").to_string();
-    let run_id = option_env!("GITHUB_RUN_ID").unwrap_or("").to_string();
-    let run_attempt = option_env!("GITHUB_RUN_ATTEMPT").unwrap_or("").to_string();
 
     BuildInfo {
         version,
         build_id,
         commit_sha,
-        run_id,
-        run_attempt,
     }
 }
 
