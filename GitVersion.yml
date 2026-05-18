@@ -4,6 +4,7 @@ next-version: 1.0.0
 
 assembly-versioning-scheme: MajorMinorPatch
 assembly-file-versioning-scheme: MajorMinorPatch
+version-in-branch-pattern: '.*(?<version>\d+\.\d+(\.\d+)?)'
 
 branches:
   dev:
@@ -20,7 +21,9 @@ branches:
     mode: ContinuousDelivery
     tag: beta
     increment: Patch
-    prevent-increment-of-merged-branch-version: true
+    prevent-increment:
+      of-merged-branch: true
+      when-current-commit-tagged: true
     is-release-branch: true
 
 major-version-bump-message: '\+semver:\s?(breaking|major)'
