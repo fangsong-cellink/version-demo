@@ -8,16 +8,38 @@ This template should help get you started developing with Tauri, React and Types
 
 ## CI & Versioning
 
-This repository includes a GitHub Actions workflow that builds the frontend and the Tauri Rust backend.
+This repository uses [GitVersion](https://gitversion.net/) (v6) to derive a SemVer version automatically from the git graph — no manual version bumps needed in most cases.
 
-- The workflow uses GitVersion (GitTools) to compute a SemVer-style `VERSION` from your git history and tags.
-- Each CI run attaches a monotonic build id composed from `${{ github.run_id }}-{{ github.run_attempt }}` which is embedded into both the frontend and the Rust binary.
-- Release branches named like `vX.X` will trigger the workflow automatically.
+### Branch model
 
-What you can see in the app:
+| Branch pattern | Example | Version produced | Pre-release tag |
+|---|---|---|---|
+| `dev` / `main` / `master` | `dev` | `X.(Y+1).0-alpha.N` | `alpha` |
+| `release/version-demo_vX.Y` | `release/version-demo_v3.1` | `X.Y.0-beta.N` | `beta` |
+| Tagged commit | `release/version-demo_v3.1.0` | `3.1.0` (stable) | — |
 
-- Frontend: a generated `src/build-info.json` is included in the bundle and shows `version`, `buildId`, and `commitSha`.
-- Backend: the Rust side exposes a `get_build_info` Tauri command that returns the same metadata at runtime.
+- **`dev` branch** uses ContinuousDeployment mode. Every commit produces `X.(Y+1).0-alpha.N` where `N` is the commit count since the last release tag. Minor version increments automatically.
+- **`release/version-demo_vX.Y` branches** use ContinuousDelivery mode. The `X.Y` in the branch name drives the base version — no anchor tag required. Every commit produces `X.Y.0-beta.N` where `N` is the commit count on that branch.
+- **Tagging a release commit** as `release/version-demo_vX.Y.Z` (or `release/version-demo_vX.Y.Z-beta.N`) produces exactly `X.Y.Z` (or `X.Y.Z-beta.N`) with no increment.
+
+### Bumping the major version
+
+Include `+semver: breaking` or `+semver: major` in `dev` in a commit message to trigger a major version bump.
+
+### Tag prefix
+
+Tags must be prefixed with `release/version-demo_v` (e.g. `release/version-demo_v3.1.0`).
+
+### CI workflow
+
+- The workflow triggers on pushes to `dev`, `release/*` branches, and `release/*` tags.
+- GitVersion computes the `VERSION` and injects it before the build.
+- Each CI run embeds a monotonic build id `${{ github.run_id }}-${{ github.run_attempt }}` into both the frontend bundle and the Rust binary.
+
+### What the app shows
+
+- **Frontend**: `src/build-info.json` (generated at build time) contains `version`, `buildId`, and `commitSha`.
+- **Backend**: the `get_build_info` Tauri command returns the same metadata at runtime.
 
 Local testing:
 
