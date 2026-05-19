@@ -61,3 +61,32 @@ cargo build --release
 ```
 
 In CI, the `src/build-info.json` file is created by the workflow before the frontend build so the version is baked into the produced bundle.
+
+### Cherry-pick bot
+
+A GitHub Action automatically creates cherry-pick pull requests when you comment `/cherry-pick-to <branch>` on any **merged** pull request.
+
+**Usage:**
+```
+/cherry-pick-to release/1.x
+```
+
+The bot will:
+1. Extract the squash-merge commit from the original PR
+2. Create a new branch off the target branch
+3. Cherry-pick the commit
+4. Open a PR titled `[Cherry Pick] <original title> → <target-branch>`
+5. Link back to the original PR in a comment
+
+**Prerequisites:**
+
+For the bot to work, GitHub Actions must have permission to create PRs. Enable this in your repository settings:
+
+1. Go to **Settings → Actions → General**
+2. Under **Workflow permissions**, select **"Read and write permissions"**
+3. Check **"Allow GitHub Actions to create and approve pull requests"**
+4. Click **Save**
+
+![image.png](./docs/image.png)
+
+Without this setting, the workflow will fail with `HttpError: GitHub Actions is not permitted to create or approve pull requests`.

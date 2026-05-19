@@ -78,7 +78,7 @@ jobs:
           git fetch origin "${TARGET_BRANCH}"
           git checkout -b "${CHERRY_BRANCH}" "origin/${TARGET_BRANCH}"
           git cherry-pick "${COMMIT_SHA}"
-          git push origin "${CHERRY_BRANCH}"
+          git push --force-with-lease origin "${CHERRY_BRANCH}"
 
       - name: Create pull request
         uses: actions/github-script@v7
