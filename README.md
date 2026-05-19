@@ -38,6 +38,16 @@ Tags must be prefixed with `release/version-demo_v` (e.g. `release/version-demo_
 - GitVersion computes the `VERSION` and injects it before the build.
 - Each CI run embeds a monotonic build id `${{ github.run_id }}-${{ github.run_attempt }}` into both the frontend bundle and the Rust binary.
 
+### Automatic releases
+
+When you push a tag matching `release/version-demo_vX.Y.Z`, the CI workflow automatically:
+
+1. Builds the frontend and Rust backend
+2. Creates a **GitHub Release** with:
+   - Release name and tag from the tag name (e.g., `release/version-demo_v1.2.3`)
+   - Zipped frontend dist artifact
+   - Auto-generated release notes from merged PRs and commits since the last tag
+
 ### What the app shows
 
 - **Frontend**: `src/build-info.json` (generated at build time) contains `version`, `buildId`, and `commitSha`.
