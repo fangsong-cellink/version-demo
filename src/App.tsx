@@ -5,7 +5,7 @@ import buildInfoStatic from "./build-info.json";
 import "./App.css";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
+  const [greetMsg, setGreetMsg] = useState("FIX");
   const [name, setName] = useState("");
   const [buildInfo, setBuildInfo] = useState<any | null>(null);
 
