@@ -22,7 +22,7 @@ function App() {
 
   return (
     <main className="container">
-      <h1>Welcome to Tauri + React next version XXX breaking XXX WWW AAA WWaaaW</h1>
+      <h1>Welcome to Tauri + React next version XXX breaking XXX WWW AAA WWaaaW xxx</h1>
 
       <div className="row">
         <a href="https://vite.dev" target="_blank">
