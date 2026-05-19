@@ -127,7 +127,6 @@ Hotfixes (security patches, critical bugs) applied to release branches must be c
 ### Positive
 - **No manual version management:** Versions are computed from git state; no risk of skipping numbers or duplicates
 - **Complete traceability:** `buildId + commitSha + SemVer` triple uniquely identifies every artifact
-- **Reproducibility:** Rebuilding a commit always produces the same version (deterministic)
 - **Reduced coordination:** Teams don't need to coordinate version bumps; they happen automatically
 - **Clear release gates:** Explicit tagging ceremony enforces discipline and intentionality
 - **Branching clarity:** Three tiers (dev/release/stable) provide unambiguous handoff points
