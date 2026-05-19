@@ -1,30 +1,84 @@
+# Global default build mode: ContinuousDelivery
+# For untagged commits, the version number will not increment on every single commit.
 mode: ContinuousDelivery
+
+# Regular expression to match the prefix of your Git tags.
 tag-prefix: '(release\/)?(version-demo_v)?'
+
+# The next expected version fallback if no Git tags are found in the history.
+# Since the tag-prefix above allows optional matching, a pure '1.0.0' numeric format will not cause parsing errors here.
 next-version: 1.0.0
 
+# Scheme used to generate the Windows Assembly Version (Format: Major.Minor.Patch.0).
 assembly-versioning-scheme: MajorMinorPatch
+
+# Scheme used to generate the Windows Assembly File Version (Format: Major.Minor.Patch.0).
 assembly-file-versioning-scheme: MajorMinorPatch
+
+# We create a branch for each **Minor** version, and Patch versions are tags on that branch.
 semantic-version-format: Loose
 version-in-branch-pattern: '.*(?<version>\d+\.\d+(\.\d+)?)'
 
+# Branch-specific configurations dictionary
 branches:
+  # 1. Main trunk / Development branch configuration (Covers master, main, and dev)
   dev:
+    # Regex matching branch names that should fall under this strategy.
     regex: ^master$|^main$|^dev$
+    
+    # Overrides the global mode to ContinuousDeployment: every commit or merge instantly bumps the pre-release counter (not version number!) by 1.
     mode: ContinuousDeployment
+    
+    # Pre-release tag suffix appended to versions built from this branch (e.g., 1.1.0-alpha.1).
     tag: alpha
+
+    # Sets the target direction for version advancement: aims for the next Minor version.
+    # commits on this branch will build towards the next Minor, namely after we created a release branch for 1.1.x, 
+    # every commit on dev will become 1.2.0-alpha.1, 1.2.0-alpha.2, etc, until we create a release branch for 1.2.x.
+    # DOES NOT mean incrementing the Minor digit on every single commit!
     increment: Minor
+    
+    # Merging branches into 'dev' will not double-increment the version due to the merge commit itself.
     prevent-increment-of-merged-branch-version: true
+    
+    # Tracks release branches dynamically.
+    # Once a new 'release/*' branch is created, 'dev' senses it, yields the current version to it, and automatically increments itself to the next Minor target.
     tracks-release-branches: true 
+    
+    # Explicitly states that 'dev' is not a dedicated release branch.
     is-release-branch: false
 
+  # 2. Release preparation branches configuration
   release:
+    # Strictly matches release branch names like 'release/version-demo_v1.1'.
+    # The named group (?<version>\d+\.\d+) captures '1.1' and freezes the Minor version for this branch lifecycle.
     regex: ^release\/version-demo_v(?<version>\d+\.\d+)
+    
+    # Uses ContinuousDelivery mode: version counters stay stable across standard commits unless an explicit tag is evaluated.
     mode: ContinuousDelivery
+    
+    # Pre-release tag suffix appended to versions built from this branch (e.g., 1.1.0-beta.1).
     tag: beta
+    
+    # Sets the target direction for version advancement: aims for the next Patch version.
+    # commits on this branch will build towards the next Patch, namely after we created a release tag for 1.1.0,
+    # every commit on dev will become 1.1.1-alpha.1, 1.1.1-alpha.2, etc, until we create a release tag for 1.1.1.
+    # DOES NOT mean incrementing the Patch digit on every single commit!
     increment: Patch
+    
+    # Fine-grained increment prevention rules:
     prevent-increment:
+      # Prevents version bumps triggered solely by pulling bugfixes into this release branch.
       of-merged-branch: true
+      # Prevents any automatic increment if the current commit already has an explicit Git tag attached to it.
       when-current-commit-tagged: true
+      
+    # Declares this as a high-priority "Release Branch". 
+    # It acts as a base upstream for downstream hotfixes and triggers version-yielding behavior on tracking branches like 'dev'.
     is-release-branch: true
 
+# Custom regex pattern used to scan commit messages for forcing a Major version bump.
+# Including '+semver: breaking' or '+semver: major' in a commit message will bypass defaults and increment the Major version number by 1.
+# This should only be triggered on `dev` when a breaking change is introduced.
+# There are no ways to prevent doing this on release branches, but please DO NOT DO IT!
 major-version-bump-message: '\+semver:\s?(breaking|major)'
