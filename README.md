@@ -12,7 +12,7 @@ This repository includes a GitHub Actions workflow that builds the frontend and 
 
 - The workflow uses GitVersion (GitTools) to compute a SemVer-style `VERSION` from your git history and tags.
 - Each CI run attaches a monotonic build id composed from `${{ github.run_id }}-{{ github.run_attempt }}` which is embedded into both the frontend and the Rust binary.
-- Release branches named like `vX.X` or tags (for RCs, e.g. `v1.2.0-rc.1`) will trigger the workflow automatically.
+- Release branches named like `vX.X` will trigger the workflow automatically.
 
 What you can see in the app:
 
