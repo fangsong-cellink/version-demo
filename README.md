@@ -8,6 +8,8 @@ This template should help get you started developing with Tauri, React and Types
 
 ## CI & Versioning
 
+For reasoning about this decision, refer to the [ADR (Architecture Decision Record) doc](./docs/adr/0001-automated-git-driven-versioning-with-gitversion.md).
+
 This repository uses [GitVersion](https://gitversion.net/) (v6) to derive a SemVer version automatically from the git graph — no manual version bumps needed in most cases.
 
 ### Branch model
